@@ -1,0 +1,340 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class Game {
+    public static void main(String[] args) {
+        // Start the game
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("WELCOME TO THE TALES OF LOST SOULS");
+        System.out.print("Would you like to start the game? [Y/N] ");
+        String input = scanner.nextLine().toLowerCase();
+
+        if (input.equals("y")) {
+            // Create the player with base stats
+            Player player = new Player(1, 50, 13);
+            int area = 1;
+
+            // Area 1 - Tutorial
+            while (area == 1) {
+                Enemy enemy = new Enemy("Walking Skeleton", 20, 8);
+                System.out.println("== Area 1 == [Tutorial]");
+                System.out.println("You Have Encountered a " + enemy.getName() + "!");
+                battle(player, enemy, scanner);
+
+                if (player.getHp() > 0) {
+                    System.out.print("Do you want to proceed to the next area? [Y/N] ");
+                    input = scanner.nextLine().toLowerCase();
+                    if (input.equals("y")) {
+                        player.levelUp(); // Level up after the battle
+                        area++;
+                    } else {
+                        System.out.println("You have chosen to exit the game.");
+                        return;
+                    }
+                } else {
+                    System.out.println("Game Over!");
+                    return;
+                }
+            }
+
+            // Area 2 - Dungeon Hall
+            while (area == 2) {
+                Enemy enemy = new Enemy("Skeleton Archer", 25, 10);
+                System.out.println("== Area 2 == [Dungeon Hall]");
+                System.out.println("You Have Encountered a " + enemy.getName() + "!");
+                battle(player, enemy, scanner);
+
+                if (player.getHp() > 0) {
+                    System.out.print("Do you want to proceed to the next area? [Y/N] ");
+                    input = scanner.nextLine().toLowerCase();
+                    if (input.equals("y")) {
+                        player.levelUp(); // Level up after the battle
+                        area++;
+                    } else {
+                        System.out.println("You have chosen to exit the game.");
+                        return;
+                    }
+                } else {
+                    System.out.println("Game Over!");
+                    return;
+                }
+            }
+
+            // Area 3 - Character Selection
+            while (area == 3) {
+                System.out.println("Choose Your Character:");
+                System.out.println("[1] Aeris // Swordsman");
+                System.out.println("[2] Lira // Archer");
+                System.out.println("[3] Shira // Mage");
+
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+
+                switch (choice) {
+                    case 1:
+                        player.setCharacter("Aeris", 60, 20, new Skills("Slash", "Parry"));
+                        System.out.println("You have chosen Aeris, the Swordsman.");
+                        System.out.println("Aeris, the valiant swordsman, trained in the art of combat since childhood...");
+                        break;
+                    case 2:
+                        player.setCharacter("Lira", 50, 25, new Skills("Pierce", "Evade"));
+                        System.out.println("You have chosen Lira, the Archer.");
+                        System.out.println("Lira, a skilled marksman with a bow, silent and deadly...");
+                        break;
+                    case 3:
+                        player.setCharacter("Shira", 45, 30, new Skills("Flare Shot", "Ice Field"));
+                        System.out.println("You have chosen Shira, the Mage.");
+                        System.out.println("Shira, a master of the arcane, capable of casting powerful spells...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice, please choose again.");
+                        continue;
+                }
+
+                System.out.print("Do you want to proceed to the next area? [Y/N] ");
+                input = scanner.nextLine().toLowerCase();
+                if (input.equals("y")) {
+                    area++;
+                } else {
+                    System.out.println("You have chosen to exit the game.");
+                    return;
+                }
+            }
+
+            // Area 4 - Dungeon Depths
+            while (area == 4) {
+                Enemy enemy = new Enemy("Skeleton Knight", 30, 15);
+                System.out.println("== Area 4 == [Dungeon Depths]");
+                System.out.println("You Have Encountered a " + enemy.getName() + "!");
+                battleWithSkills(player, enemy, scanner);
+
+                if (player.getHp() > 0) {
+                    System.out.print("Do you want to proceed to the next area? [Y/N] ");
+                    input = scanner.nextLine().toLowerCase();
+                    if (input.equals("y")) {
+                        player.levelUp(); // Level up after the battle
+                        area++;
+                    } else {
+                        System.out.println("You have chosen to exit the game.");
+                        return;
+                    }
+                } else {
+                    System.out.println("Game Over!");
+                    return;
+                }
+            }
+
+            // Final Boss Encounter
+            if (area == 5) {
+                Enemy finalBoss = new Enemy("The Dark Lord", 100, 18);
+                System.out.println("== Final Boss Area == [The Dark Fortress]");
+                System.out.println("You Have Encountered " + finalBoss.getName() + "!");
+                battleWithSkills(player, finalBoss, scanner);
+
+                if (player.getHp() > 0) {
+                    System.out.println("Congratulations! You have defeated " + finalBoss.getName() + "!");
+                } else {
+                    System.out.println("Game Over!");
+                }
+            }
+
+        } else {
+            System.out.println("Exiting game...");
+        }
+    }
+
+    // Basic battle logic
+    public static void battle(Player player, Enemy enemy, Scanner scanner) {
+        while (player.getHp() > 0 && enemy.getHp() > 0) {
+            System.out.println("[lvl " + player.getLevel() + "] Player: [ HP " + player.getHp() + " | ATK " + player.getAtk() + " ]");
+            System.out.println("[lvl 1] Enemy: [ HP " + enemy.getHp() + " | ATK " + enemy.getAtk() + " ]");
+            System.out.println("> [1] Hit ");
+            System.out.println("> [2] Block");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (choice == 1) {
+                System.out.println("[ Ability : Hit ]");
+                System.out.println("You Have Dealt " + player.getAtk() + " Damage to " + enemy.getName() + "!");
+                enemy.takeDamage(player.getAtk());
+
+                if (enemy.getHp() > 0) {
+                    System.out.println(enemy.getName() + " Dealt " + enemy.getAtk() + " Damage! to you!");
+                    player.takeDamage(enemy.getAtk());
+                }
+
+            } else if (choice == 2) {
+                System.out.println("[ Ability : Block ]");
+                System.out.println("You blocked the enemy's attack and took no damage!");
+            } else {
+                System.out.println("Invalid choice.");
+            }
+        }
+
+        if (enemy.getHp() <= 0) {
+            System.out.println("Enemy defeated!");
+        }
+    }
+
+    // Battle with skills based on the player's hero
+    public static void battleWithSkills(Player player, Enemy enemy, Scanner scanner) {
+        while (player.getHp() > 0 && enemy.getHp() > 0) {
+            System.out.println("[lvl " + player.getLevel() + "] Player: [ HP " + player.getHp() + " | ATK " + player.getAtk() + " ]");
+            System.out.println("[lvl 1] Enemy: [ HP " + enemy.getHp() + " | ATK " + enemy.getAtk() + " ]");
+            System.out.println("> [1] " + player.getSkills().getSkill1Name() + " ");
+            System.out.println("> [2] " + player.getSkills().getSkill2Name());
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (choice == 1) {
+                System.out.println("[ Ability : " + player.getSkills().getSkill1Name() + " ]");
+                double damage = player.getAtk() * 1.2; // 20% more damage
+                System.out.println("You Have Dealt " + damage + " Damage to " + enemy.getName() + "!");
+                enemy.takeDamage(damage);
+
+                if (enemy.getHp() > 0) {
+                    System.out.println(enemy.getName() + " Dealt " + enemy.getAtk() + " Damage! to you!");
+                    player.takeDamage(enemy.getAtk());
+                }
+
+            } else if (choice == 2) {
+                System.out.println("[ Ability : " + player.getSkills().getSkill2Name() + " ]");
+                // Implement skill effect based on the hero
+                if (player.getCharacter().equals("Aeris")) {
+                    System.out.println("You blocked the enemy's attack and have a 60% chance to stun them!");
+                } else if (player.getCharacter().equals("Lira")) {
+                    System.out.println("You evaded the attack and healed for 5% of your HP!");
+                    player.heal(player.getMaxHp() * 0.05);
+                } else if (player.getCharacter().equals("Shira")) {
+                    System.out.println("You cast a powerful spell dealing double damage!");
+                    double damage = player.getAtk() * 2;
+                    enemy.takeDamage(damage);
+                    System.out.println("You have dealt " + damage + " Damage to " + enemy.getName() + "!");
+                }
+            } else {
+                System.out.println("Invalid choice.");
+            }
+        }
+
+        if (enemy.getHp() <= 0) {
+            System.out.println("Enemy defeated!");
+        }
+    }
+}
+
+class Player {
+    private int level;
+    private double hp;
+    private double maxHp;
+    private double atk;
+    private String character;
+    private Skills skills;
+
+    public Player(int level, double hp, double atk) {
+        this.level = level;
+        this.maxHp = hp;
+        this.hp = hp;
+        this.atk = atk;
+    }
+
+    public void levelUp() {
+        this.level++;
+        this.maxHp += 10; // Increase max HP by 10 upon leveling up
+        this.hp = this.maxHp; // Heal player to max HP on level up
+        this.atk += 3; // Increase attack by 3 upon leveling up
+        System.out.println("You leveled up to Level " + this.level + "!");
+        System.out.println("New Max HP: " + this.maxHp + ", New ATK: " + this.atk);
+    }
+
+    public void takeDamage(double damage) {
+        this.hp -= damage;
+        if (this.hp < 0) this.hp = 0;
+    }
+
+    public void heal(double amount) {
+        this.hp += amount;
+        if (this.hp > maxHp) this.hp = maxHp;
+        System.out.println("You healed for " + amount + " HP. Current HP: " + this.hp);
+    }
+
+    public void setCharacter(String character, double hp, double atk, Skills skills) {
+        this.character = character;
+        this.maxHp = hp;
+        this.hp = hp;
+        this.atk = atk;
+        this.skills = skills;
+    }
+
+    public String getCharacter() {
+        return character;
+    }
+
+    public double getHp() {
+        return hp;
+    }
+
+    public double getAtk() {
+        return atk;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public double getMaxHp() { // Add this method to return max HP
+        return maxHp;
+    }
+
+    public Skills getSkills() {
+        return skills;
+    }
+}
+
+class Enemy {
+    private String name;
+    private double hp;
+    private double atk;
+
+    public Enemy(String name, double hp, double atk) {
+        this.name = name;
+        this.hp = hp;
+        this.atk = atk;
+    }
+
+    public void takeDamage(double damage) {
+        this.hp -= damage;
+        if (this.hp < 0) this.hp = 0;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getHp() {
+        return hp;
+    }
+
+    public double getAtk() {
+        return atk;
+    }
+}
+
+class Skills {
+    private String skill1Name;
+    private String skill2Name;
+
+    public Skills(String skill1Name, String skill2Name) {
+        this.skill1Name = skill1Name;
+        this.skill2Name = skill2Name;
+    }
+
+    public String getSkill1Name() {
+        return skill1Name;
+    }
+
+    public String getSkill2Name() {
+        return skill2Name;
+    }
+}
